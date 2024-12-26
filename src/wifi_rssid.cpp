@@ -1,3 +1,5 @@
+#ifdef IOTCLOUD_ENABLE_WIFI_RSSI
+
 #include "wifi_rssid.h"
 
 IotCloud_Wifi_RSSI::IotCloud_Wifi_RSSI(
@@ -21,3 +23,5 @@ void IotCloud_Wifi_RSSI::get_value()
         set_value(rssi);
     }
 }
+
+#endif // IOTCLOUD_ENABLE_WIFI_RSSI

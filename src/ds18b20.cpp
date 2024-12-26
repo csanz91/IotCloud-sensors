@@ -1,3 +1,4 @@
+#ifdef IOTCLOUD_ENABLE_DS18B20
 
 #include "ds18b20.h"
 
@@ -53,3 +54,5 @@ float DS18B20::get_value()
     }
     return value;
 }
+
+#endif // IOTCLOUD_ENABLE_DS18B20

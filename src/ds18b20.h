@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IOTCLOUD_ENABLE_DS18B20
+
 #include <Arduino.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -23,3 +25,5 @@ private:
     OneWire *_one_wire;
     Steps _current_step = Steps::GET_ADDR;
 };
+
+#endif // IOTCLOUD_ENABLE_DS18B20

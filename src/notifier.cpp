@@ -1,4 +1,4 @@
-#include "notifier.h" x
+#include "notifier.h"
 
 NOTIFIER::NOTIFIER(
     const char *sensor_id,

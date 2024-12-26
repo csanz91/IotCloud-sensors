@@ -1,4 +1,6 @@
-#include "servo_button.h" x
+#ifdef IOTCLOUD_ENABLE_SERVO
+
+#include "servo_button.h"
 
 SERVO_BUTTON::SERVO_BUTTON(
     const char *sensor_id,
@@ -40,3 +42,5 @@ void SERVO_BUTTON::loop()
         _last_toogled = 0;
     }
 }
+
+#endif // IOTCLOUD_ENABLE_SERVO

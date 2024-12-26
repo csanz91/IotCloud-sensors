@@ -1,4 +1,6 @@
-#include "co2_sensor.h" x
+#ifdef IOTCLOUD_ENABLE_CO2_SENSOR
+
+#include "co2_sensor.h"
 
 IotCloud_CO2::IotCloud_CO2(
     const char *sensor_id,
@@ -13,8 +15,14 @@ IotCloud_CO2::IotCloud_CO2(
                                                metadata,
                                                0.03) // 3% filtering
 {
+    #ifdef ESP8266
     _serial = new SoftwareSerial(rx, tx);
     _serial->begin(9600);
+#elif defined(ARDUINO_ARCH_ESP32)
+    _serial = new HardwareSerial(2); // Using UART2 for ESP32
+    _serial->begin(9600, SERIAL_8N1, rx, tx);
+#endif
+    
     _co2_sensor = new MHZ19();
     _co2_sensor->begin(*_serial);
     _co2_sensor->autoCalibration(false);
@@ -43,3 +51,5 @@ void IotCloud_CO2::get_value()
         set_value(ppm);
     }
 }
+
+#endif // IOTCLOUD_ENABLE_CO2_SENSOR

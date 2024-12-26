@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IOTCLOUD_ENABLE_SERVO
+
 #include <sensors/toogle.h>
 #include <Servo.h>
 
@@ -26,3 +28,5 @@ public:
         const unsigned long resting_angle,
         const int pin);
 };
+
+#endif // IOTCLOUD_ENABLE_SERVO
