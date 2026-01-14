@@ -1,5 +1,3 @@
-#ifdef IOTCLOUD_ENABLE_SI7021_AM2301
-
 #include "si7021_am2301.h"
 
 SI7021_AM2301::SI7021_AM2301(
@@ -7,6 +5,8 @@ SI7021_AM2301::SI7021_AM2301(
     const SensorModel sensor_model) : _sensor_pin(sensor_pin),
                                       _sensor_model(sensor_model)
 {
+    temperature = NAN;
+    humidity = NAN;
 }
 
 bool SI7021_AM2301::waitState(int state)
@@ -170,5 +170,3 @@ void SI7021_AM2301::read_values()
     temperature = NAN;
     humidity = NAN;
 }
-
-#endif // IOTCLOUD_ENABLE_SI7021_AM2301

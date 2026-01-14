@@ -33,8 +33,8 @@ void IotCloud_CO2::init(char *mqtt_header, EspMQTTClient *mqtt_client)
 {
     AnalogSensor::init(mqtt_header, mqtt_client);
 
-    char constructedTopic[94] = "";
-    construct_topic(constructedTopic, "aux/calibrate");
+    char constructedTopic[128] = "";
+    construct_topic(constructedTopic, sizeof(constructedTopic), "aux/calibrate");
     mqtt_client->subscribe(constructedTopic, [&](const String &payload)
                            {
                                Serial.println("Calibration requested...");

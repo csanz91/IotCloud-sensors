@@ -23,7 +23,7 @@ void NOTIFIER::send_notification(const char *payload)
     if (!_mqtt_client)
         return;
 
-    char constructedTopic[120] = "";
-    construct_topic(constructedTopic, "aux/notification");
+    char constructedTopic[128] = "";
+    construct_topic(constructedTopic, sizeof(constructedTopic), "aux/notification");
     _mqtt_client->publish(constructedTopic, payload);
 }

@@ -56,7 +56,7 @@ void PRESENCE_SENSOR::report_presence(bool presence)
     {
         return;
     }
-    char constructedTopic[94] = "";
-    construct_topic(constructedTopic, "state");
+    char constructedTopic[128] = "";
+    construct_topic(constructedTopic, sizeof(constructedTopic), "state");
     _mqtt_client->publish(constructedTopic, presence ? "true" : "false", true);
 }
