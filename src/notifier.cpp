@@ -16,13 +16,12 @@ NOTIFIER::NOTIFIER(
 void NOTIFIER::init(char *mqtt_header, EspMQTTClient *mqtt_client)
 {
     BaseSensor::init(mqtt_header, mqtt_client);
-
-    _mqtt_client = mqtt_client;
 }
 
 void NOTIFIER::send_notification(const char *payload)
 {
-    if (!_mqtt_client)
+    // Uses BaseSensor::_mqtt_client, which stays null until the first connect
+    if (!_mqtt_client || !_mqtt_client->isConnected())
         return;
 
     char constructedTopic[128] = "";

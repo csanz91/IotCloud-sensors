@@ -104,6 +104,7 @@ SI7021_AM2301::ReadingErrors SI7021_AM2301::do_plugin_read()
         int data = read_dht_dat();
         if (data == -1)
         {
+            interrupts();
             return ReadingErrors::error_protocol_timeout;
         }
         dht_dat[i] = data;

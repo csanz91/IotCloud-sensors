@@ -14,6 +14,14 @@ PRESENCE_SENSOR::PRESENCE_SENSOR(
     _setup_time = millis();
 }
 
+void PRESENCE_SENSOR::init(char *mqtt_header, EspMQTTClient *mqtt_client)
+{
+    BaseSensor::init(mqtt_header, mqtt_client);
+    // init() runs on every MQTT connect. Resend the state so the retained
+    // value catches up with any change made while offline.
+    _report_pending = true;
+}
+
 void PRESENCE_SENSOR::loop()
 {
     const unsigned long now = millis();
@@ -26,7 +34,7 @@ void PRESENCE_SENSOR::loop()
     if (!_initial_report_done) {
         _initial_report_done = true;
         _presence_state = digitalRead(_switch_pin);
-        report_presence(_presence_state);
+        _report_pending = true;
     }
 
     bool switch_state = digitalRead(_switch_pin);
@@ -44,22 +52,28 @@ void PRESENCE_SENSOR::loop()
             if (_presence_state != switch_state)
             {
                 _presence_state = switch_state;
-                report_presence(switch_state);
+                _report_pending = true;
             }
         }
     }
 
     _last_state = switch_state;
+
+    // Retry until the broker has the state; a publish while offline is lost.
+    if (_report_pending && report_presence(_presence_state))
+    {
+        _report_pending = false;
+    }
 }
 
-void PRESENCE_SENSOR::report_presence(bool presence)
+bool PRESENCE_SENSOR::report_presence(bool presence)
 {
     if (!_mqtt_client || !_mqtt_client->isConnected())
     {
-        return;
+        return false;
     }
     char constructedTopic[128] = "";
     construct_topic(constructedTopic, sizeof(constructedTopic), "state");
-    _mqtt_client->publish(constructedTopic, presence ? "true" : "false", true);
+    return _mqtt_client->publish(constructedTopic, presence ? "true" : "false", true);
 }
 #endif
