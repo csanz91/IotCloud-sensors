@@ -1,6 +1,7 @@
-#ifdef IOTCLOUD_ENABLE_CO2_SENSOR
 
 #include "co2_sensor.h"
+
+#ifdef IOTCLOUD_ENABLE_CO2_SENSOR
 
 IotCloud_CO2::IotCloud_CO2(
     const char *sensor_id,
@@ -45,11 +46,16 @@ void IotCloud_CO2::init(char *mqtt_header, EspMQTTClient *mqtt_client)
 void IotCloud_CO2::get_value()
 {
     int ppm_uart = _co2_sensor->getCO2(true);
-    if (ppm_uart != 0)
+    if (ppm_uart > 0)
     {
         float ppm = (float)ppm_uart;
         set_value(ppm);
     }
+    else
+    {
+        // Sensor returned 0 or negative (not ready or communication error)
+        Serial.println("CO2 sensor: no valid reading");
+    }
 }
+#endif
 
-#endif // IOTCLOUD_ENABLE_CO2_SENSOR

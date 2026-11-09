@@ -29,5 +29,5 @@ public:
         const char *metadata,
         const int rx, const int tx);
 };
+#endif
 
-#endif // IOTCLOUD_ENABLE_CO2_SENSOR

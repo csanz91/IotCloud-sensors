@@ -2,20 +2,20 @@
 
 #ifdef IOTCLOUD_ENABLE_SERVO
 
-#include <sensors/toogle.h>
+#include <sensors/toggle.h>
 #include <Servo.h>
 
-class SERVO_BUTTON : public Toogle
+class SERVO_BUTTON : public Toggle
 {
 
 private:
-    const long _activation_time;
+    const long unsigned _activation_time;
     const long _activation_angle;
     const long _resting_angle;
-    unsigned long _last_toogled = 0;
+    unsigned long _last_toggled = 0;
     Servo *_servo;
     void push_button(bool state);
-    void set_toogle_state(ToogleStates);
+    void set_toggle_state(ToggleState);
     void loop();
 
 public:

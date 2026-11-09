@@ -20,9 +20,11 @@ public:
     DS18B20(const int one_wire_bus);
 
 private:
+    bool discover_sensor();
     DallasTemperature *_sensors;
     DeviceAddress _sensor_addr;
     OneWire *_one_wire;
+    bool _sensor_found = false;
     Steps _current_step = Steps::GET_ADDR;
 };
 

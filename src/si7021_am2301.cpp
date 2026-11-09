@@ -1,3 +1,5 @@
+#ifdef IOTCLOUD_ENABLE_SI7021
+
 #include "si7021_am2301.h"
 
 SI7021_AM2301::SI7021_AM2301(
@@ -170,3 +172,5 @@ void SI7021_AM2301::read_values()
     temperature = NAN;
     humidity = NAN;
 }
+
+#endif

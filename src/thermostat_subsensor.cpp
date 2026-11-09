@@ -1,3 +1,5 @@
+#ifdef IOTCLOUD_ENABLE_THERMOSTAT
+
 #include "thermostat_subsensor.h"
 #include <ArduinoJson.h>
 
@@ -19,6 +21,7 @@ ThermostatSubsensor::ThermostatSubsensor(
     _sensor = new SI7021_AM2301(sensor_pin, sensor_model);
     _custom_text[0] = '\0';
     _custom_text_expiration = 0;
+    _display_brightness = 1.0f;
 }
 
 void ThermostatSubsensor::init(char *mqtt_header, EspMQTTClient *mqtt_client)
@@ -30,8 +33,72 @@ void ThermostatSubsensor::init(char *mqtt_header, EspMQTTClient *mqtt_client)
     strncpy(_cached_subdeviceId, data.subdeviceId, sizeof(_cached_subdeviceId));
     strncpy(_cached_subsensorId, data.subsensorId, sizeof(_cached_subsensorId));
 
+    // Subscribe to custom display text topic
+    // Expected payload: {"text": "Hello World", "ttl": 10} (ttl in seconds)
+    char displayTopic[160] = "";
+    construct_topic(displayTopic, sizeof(displayTopic), "aux/display");
+    mqtt_client->subscribe(displayTopic, [this](const String &payload) {
+        StaticJsonDocument<128> doc;
+        DeserializationError error = deserializeJson(doc, payload);
+        if (error) {
+            return;
+        }
+        
+        const char* text = doc["text"] | "";
+        unsigned long ttl = doc["ttl"] | 0;
+        
+        if (ttl > 0 && text[0] != '\0') {
+            strncpy(_custom_text, text, sizeof(_custom_text) - 1);
+            _custom_text[sizeof(_custom_text) - 1] = '\0';
+            _custom_text_expiration = millis() + (ttl * 1000);
+        } else {
+            // Clear custom text if ttl is 0 or text is empty
+            _custom_text[0] = '\0';
+            _custom_text_expiration = 0;
+        }
+    });
+
+    // Subscribe to display brightness topic (float 0.0 - 1.0)
+    displayTopic[0] = '\0';
+    construct_topic(displayTopic, sizeof(displayTopic), "aux/setBrightness");
+    mqtt_client->subscribe(displayTopic, [this](const String &payload) {
+        set_display_brightness(atof(payload.c_str()));
+    });
+
+    // Report initial brightness and apply to display callback
+    set_display_brightness(_display_brightness, true);
+
     // Force an initial reading as soon as we are ready (MQTT is connected here)
     get_value();
+}
+
+void ThermostatSubsensor::set_display_brightness(float brightness, bool publish)
+{
+    if (isnan(brightness) || isinf(brightness))
+    {
+        return;
+    }
+
+    if (brightness < 0.0f)
+        brightness = 0.0f;
+    if (brightness > 1.0f)
+        brightness = 1.0f;
+
+    _display_brightness = brightness;
+
+    if (publish && _mqtt_client && _mqtt_client->isConnected())
+    {
+        char constructedTopic[160] = "";
+        construct_topic(constructedTopic, sizeof(constructedTopic), "aux/brightness");
+        char array[7];
+        dtostrf(_display_brightness, 1, 2, array);
+        _mqtt_client->publish(constructedTopic, array, true);
+    }
+
+    if (_display_brightness_callback != nullptr)
+    {
+        _display_brightness_callback(_display_brightness);
+    }
 }
 
 void ThermostatSubsensor::construct_subsensor_topic(char *newTopic, size_t size, const char *endpoint)
@@ -83,8 +150,10 @@ bool ThermostatSubsensor::report_value()
     {
         char constructedTopic[160] = "";
         construct_subsensor_topic(constructedTopic, sizeof(constructedTopic), "value");
-        char array[12];
-        dtostrf(value, 1, _decimals, array);
+        // dtostrf() doesn't check the buffer size; 48 bytes fit any finite
+        // float with up to 6 decimals (see AnalogSensor::report_value)
+        char array[48];
+        dtostrf(value, 1, _decimals > 6 ? 6 : _decimals, array);
         _mqtt_client->publish(constructedTopic, array, true);
     }
     
@@ -93,7 +162,7 @@ bool ThermostatSubsensor::report_value()
     {
         char constructedTopic[160] = "";
         construct_subsensor_topic(constructedTopic, sizeof(constructedTopic), "aux/humidity");
-        char array[12];
+        char array[48];
         dtostrf(_humidity, 1, 1, array);  // 1 decimal for humidity
         _mqtt_client->publish(constructedTopic, array, true);
     }
@@ -105,3 +174,10 @@ void ThermostatSubsensor::set_display_callback(DisplayCallback callback)
 {
     _display_callback = callback;
 }
+
+void ThermostatSubsensor::set_display_brightness_callback(DisplayBrightnessCallback callback)
+{
+    _display_brightness_callback = callback;
+}
+
+#endif

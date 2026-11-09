@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IOTCLOUD_ENABLE_SI7021
+
 #include <Arduino.h>
 
 class SI7021_AM2301
@@ -41,3 +43,5 @@ private:
     float get_temperature();
     float get_humidity();
 };
+
+#endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IOTCLOUD_ENABLE_NOTIFIER
+
 #include <sensors/sensor.h>
 
 class NOTIFIER : public BaseSensor
@@ -17,3 +19,5 @@ public:
         const char *sensor_name,
         const char *metadata);
 };
+
+#endif

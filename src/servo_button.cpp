@@ -9,7 +9,7 @@ SERVO_BUTTON::SERVO_BUTTON(
     const unsigned long activation_time,
     const unsigned long activation_angle,
     const unsigned long resting_angle,
-    const int pin) : Toogle(sensor_id,
+    const int pin) : Toggle(sensor_id,
                             sensor_name),
                      _activation_time(activation_time),
                      _activation_angle(activation_angle),
@@ -22,24 +22,26 @@ SERVO_BUTTON::SERVO_BUTTON(
 
 void SERVO_BUTTON::push_button(bool state)
 {
+    Serial.println("push_button: TOGGLE");
     _servo->write(state ? _activation_angle : _resting_angle);
 }
 
-void SERVO_BUTTON::set_toogle_state(ToogleStates toogle_state)
+void SERVO_BUTTON::set_toggle_state(ToggleState toggle_state)
 {
-    if (toogle_state == ToogleStates::TOOGLE)
+    if (toggle_state == ToggleState::TOGGLE)
     {
         push_button(true);
-        _last_toogled = millis();
+        Serial.println("SERVO_BUTTON: TOGGLE");
+        _last_toggled = millis();
     }
 }
 
 void SERVO_BUTTON::loop()
 {
-    if (_last_toogled > 0 && millis() - _last_toogled > _activation_time)
+    if (_last_toggled > 0 && millis() - _last_toggled > _activation_time)
     {
         push_button(false);
-        _last_toogled = 0;
+        _last_toggled = 0;
     }
 }
 

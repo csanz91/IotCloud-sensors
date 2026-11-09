@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IOTCLOUD_ENABLE_PRESENCE_SENSOR
+
 #include <sensors/sensor.h>
 
 class PRESENCE_SENSOR : public BaseSensor
@@ -22,3 +24,5 @@ public:
         const char *sensor_name,
         const int switch_pin);
 };
+
+#endif

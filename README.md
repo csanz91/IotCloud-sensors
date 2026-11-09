@@ -32,7 +32,7 @@ A comprehensive Arduino library providing specialized sensor implementations for
 ## Features
 
 - **Modular Design**: Each sensor type is encapsulated in its own class with a clean API
-- **Conditional Compilation**: Sensors can be selectively enabled/disabled via preprocessor defines to save memory
+- **Conditional Compilation**: Each sensor is opt-in with an `IOTCLOUD_ENABLE_*` build flag, e.g. `build_flags = -DIOTCLOUD_ENABLE_DS18B20` in `platformio.ini`. It must be a build flag: a `#define` in the sketch doesn't reach the sensor's `.cpp` file
 - **Multi-Platform Support**: Compatible with both ESP8266 and ESP32 microcontrollers
 - **MQTT Integration**: Seamless integration with the IotCloud MQTT-based home automation platform
 - **Filtering & Smoothing**: Built-in value filtering with configurable rate-of-change limits to reject spurious readings
@@ -114,7 +114,7 @@ IotCloud_CO2(
 #### Example
 
 ```cpp
-#define IOTCLOUD_ENABLE_CO2_SENSOR
+// Needs the build flag -DIOTCLOUD_ENABLE_CO2_SENSOR (a #define here would not reach the sensor's .cpp)
 #include <co2_sensor.h>
 
 IotCloud_CO2 co2_sensor("co2_living_room", "Living Room CO2", 
@@ -147,7 +147,7 @@ DS18B20(const int one_wire_bus);  // GPIO pin for the OneWire bus
 #### Usage
 
 ```cpp
-#define IOTCLOUD_ENABLE_DS18B20
+// Needs the build flag -DIOTCLOUD_ENABLE_DS18B20 (a #define here would not reach the sensor's .cpp)
 #include <ds18b20.h>
 
 DS18B20 temp_sensor(D4);
@@ -338,7 +338,7 @@ SERVO_BUTTON(
 #### Example
 
 ```cpp
-#define IOTCLOUD_ENABLE_SERVO
+// Needs the build flag -DIOTCLOUD_ENABLE_SERVO (a #define here would not reach the sensor's .cpp)
 #include <servo_button.h>
 
 // Press for 500ms, rotate from 90° (rest) to 45° (press)
@@ -372,7 +372,7 @@ IotCloud_Wifi_RSSI(
 #### Example
 
 ```cpp
-#define IOTCLOUD_ENABLE_WIFI_RSSI
+// Needs the build flag -DIOTCLOUD_ENABLE_WIFI_RSSI (a #define here would not reach the sensor's .cpp)
 #include <wifi_rssid.h>
 
 IotCloud_Wifi_RSSI rssi_sensor("wifi_signal", "WiFi Signal Strength");
@@ -457,13 +457,16 @@ IotCloud-sensors Library
 
 Enable only the sensors you need to optimize memory usage:
 
-```cpp
-// In your main sketch, BEFORE including headers:
+// In platformio.ini:
+// To ENABLE sensors:
 #define IOTCLOUD_ENABLE_CO2_SENSOR    // Enable MH-Z19 CO2 sensor
-#define IOTCLOUD_ENABLE_DS18B20       // Enable DS18B20 temperature sensor
-#define IOTCLOUD_ENABLE_SERVO         // Enable Servo button actuator
-#define IOTCLOUD_ENABLE_WIFI_RSSI     // Enable WiFi RSSI monitor
-```
+#define IOTCLOUD_ENABLE_DS18B20       // Enable DS18B20
+#define IOTCLOUD_ENABLE_SERVO         // Enable Servo
+#define IOTCLOUD_ENABLE_WIFI_RSSI     // Enable WiFi RSSI
+#define IOTCLOUD_ENABLE_THERMOSTAT    // Enable Thermostat Subsensor
+#define IOTCLOUD_ENABLE_NOTIFIER      // Enable Notifier
+#define IOTCLOUD_ENABLE_PRESENCE_SENSOR // Enable Presence Sensor
+#define IOTCLOUD_ENABLE_SI7021        // Enable SI7021/DHT Sensor
 
 ---
 
@@ -476,8 +479,8 @@ Enable only the sensors you need to optimize memory usage:
 #include <iotcloud.h>
 
 // Enable sensors before including headers
-#define IOTCLOUD_ENABLE_CO2_SENSOR
-#define IOTCLOUD_ENABLE_WIFI_RSSI
+// Needs the build flag -DIOTCLOUD_ENABLE_CO2_SENSOR (a #define here would not reach the sensor's .cpp)
+// Needs the build flag -DIOTCLOUD_ENABLE_WIFI_RSSI (a #define here would not reach the sensor's .cpp)
 
 #include <co2_sensor.h>
 #include <wifi_rssid.h>

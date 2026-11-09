@@ -1,3 +1,5 @@
+#ifdef IOTCLOUD_ENABLE_NOTIFIER
+
 #include "notifier.h"
 
 NOTIFIER::NOTIFIER(
@@ -27,3 +29,5 @@ void NOTIFIER::send_notification(const char *payload)
     construct_topic(constructedTopic, sizeof(constructedTopic), "aux/notification");
     _mqtt_client->publish(constructedTopic, payload);
 }
+
+#endif

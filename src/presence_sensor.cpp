@@ -1,3 +1,5 @@
+#ifdef IOTCLOUD_ENABLE_PRESENCE_SENSOR
+
 #include "presence_sensor.h"
 
 PRESENCE_SENSOR::PRESENCE_SENSOR(
@@ -60,3 +62,4 @@ void PRESENCE_SENSOR::report_presence(bool presence)
     construct_topic(constructedTopic, sizeof(constructedTopic), "state");
     _mqtt_client->publish(constructedTopic, presence ? "true" : "false", true);
 }
+#endif
